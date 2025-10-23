@@ -1,0 +1,22 @@
+#skills .section-inner{padding-top:32px;padding-bottom:60px}
+#skills .skills-intro{max-width:900px;margin:0 auto 28px auto;text-align:center}
+#skills .skills-intro h2{margin:0 0 10px 0;color:#fff}
+#skills .skills-intro p{margin:0;color:#e6f4ff;line-height:1.7}
+#skills .skills-list{display:grid;grid-template-columns:1fr;gap:16px;max-width:1000px;margin:0 auto;position:relative;z-index:3}
+#skills .skill-item{display:grid;grid-template-columns:150px 1fr;gap:16px;align-items:center;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);border-radius:14px;padding:14px 16px;backdrop-filter:blur(4px)}
+#skills .skill-item img{width:150px;height:110px;object-fit:cover;border-radius:10px}
+#skills .skill-item h3{margin:0 0 6px 0;color:#fff}
+#skills .skill-item p{margin:0;color:#e6f4ff;line-height:1.6}
+@media (max-width:700px){#skills .skill-item{grid-template-columns:1fr}#skills .skill-item img{width:100%;height:180px}}
+
+/* Sand, plants, and shrimp decorations at the ocean floor */
+#skills .ocean-floor{border-top:1px solid rgba(0,0,0,0.06);}
+.seafloor-decor{position:absolute;left:0;right:0;bottom:0;height:160px;pointer-events:none;z-index:2}
+.plant{position:absolute;bottom:0;width:8px;height:70px;background:linear-gradient(to top,#1b5e20,#2e7d32);border-radius:6px;transform-origin:bottom center;animation:plant-sway 4s ease-in-out infinite}
+.plant::before,.plant::after{content:"";position:absolute;left:50%;transform:translateX(-50%);width:6px;background:linear-gradient(to top,#1b5e20,#2e7d32);border-radius:6px}
+.plant::before{bottom:18px;height:46px}
+.plant::after{bottom:36px;height:32px}
+@keyframes plant-sway{0%,100%{transform:rotate(-3deg)}50%{transform:rotate(3deg)}}
+.shrimp{position:absolute;bottom:14px;width:20px;height:10px;border-radius:10px;background:#ff8a65;box-shadow:0 0 0 2px rgba(0,0,0,0.05) inset}
+.shrimp::before{content:"";position:absolute;right:-6px;top:3px;width:8px;height:4px;background:#ff7043;border-radius:2px}
+.shrimp::after{content:"";position:absolute;left:-4px;top:4px;width:6px;height:2px;background:#ff7043;border-radius:2px}

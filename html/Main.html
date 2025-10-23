@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio - Home</title>
+    <link rel="stylesheet" href="/css/main.css">
+</head>
+<body>
+    <div class="sky-section" id="skySection">
+        <div class="celestial-body sun"></div>
+        <div class="celestial-body moon"></div>
+        <div class="cloud cloud1"></div>
+        <div class="cloud cloud2"></div>
+        <div class="boat-container">
+            <div class="boat">
+                <div class="boat-top"></div>
+                <div class="boat-body"></div>
+                <div class="fisherman">
+                    <div class="bucket-hat-hook"></div>
+                    <div class="fisherman-arm">
+                        <div class="fisherman-hand">
+                            <div class="fishing-rod">
+                                <div class="fishing-line">
+                                    <div class="hook"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="water-surface"></div>
+
+    <div class="content-section" id="contentSection">
+        <div class="container">
+            <div class="intro-text">
+                <h1>Hello, I'm Jordan</h1>
+                <p>I'm a passionate IT Security Engineer who loves creating interactive and engaging experiences. With expertise in IT Security and full-stack development, I bring ideas to life through clean code and creative design.</p>
+                <p>Dive into my world of programming projects and see what I've been building!</p>
+                <a href="#portfolio" class="cta-button">View My Portfolio</a>
+                <a href="#tanks" class="cta-button">View My Fish Tanks</a>
+                <a href="#skills" class="cta-button">Skills & Achievements</a>
+            </div>
+
+            <div class="profile-container">
+                <img src="/media/profile_pic.jpg" alt="Your Profile Picture" class="profile-picture" id="profilePic">
+            </div>
+        </div>
+    </div>
+
+    <section id="portfolio" class="section portfolio-section">
+        <div class="section-inner lazy" data-src="/html/portfolio.html"></div>
+        <div class="seabed"></div>
+    </section>
+
+    <section id="tanks" class="section tanks-section">
+        <div class="section-inner lazy" data-src="/html/tanks.html"></div>
+    </section>
+
+    <section id="skills" class="section skills-section">
+        <div class="section-inner lazy" data-src="/html/skills.html"></div>
+        <div class="ocean-floor"></div>
+    </section>
+
+    <div id="fishContainer" class="fish-layer" aria-hidden="true"></div>
+    <div id="bubbleLayer" class="bubble-layer" aria-hidden="true"></div>
+
+    <script src="/javascript/main.js"></script>
+</body>
+</html>
