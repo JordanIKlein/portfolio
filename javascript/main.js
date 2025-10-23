@@ -98,10 +98,68 @@ function initBubbles(){
 }
 initBubbles();
 
+// Prevent bubbles from rendering above the water line by clipping the bubble layer
+(function initBubbleClipping(){
+    const bubbleLayer = document.getElementById('bubbleLayer');
+    if(!bubbleLayer) return;
+    let lastY = -1; let rafId = null;
+    function computeWaterlineY(){
+        const ws = document.querySelector('.water-surface');
+        if(!ws) return 0;
+        const r = ws.getBoundingClientRect();
+        // If the water-surface has scrolled above the viewport, allow bubbles from the very top
+        if(r.bottom <= 0) return 0;
+        return Math.max(0, Math.floor(r.bottom));
+    }
+    function applyClip(){
+        const y = computeWaterlineY();
+        if(y !== lastY){
+            lastY = y;
+            const val = `inset(${y}px 0 0 0)`;
+            bubbleLayer.style.clipPath = val;
+            bubbleLayer.style.webkitClipPath = val;
+        }
+        rafId = null;
+    }
+    function schedule(){ if(rafId==null) rafId = requestAnimationFrame(applyClip); }
+    window.addEventListener('scroll', schedule, { passive:true });
+    window.addEventListener('resize', schedule);
+    schedule();
+})();
+
 const fishTypes = ['clownfish', 'blue-tang', 'angelfish', 'tropical', 'yellow-tang'];
 const fishContainer = document.getElementById('fishContainer');
 const activeFish = [];
 const maxFish = 12;
+
+// Prevent fish from appearing above the water line by clipping the fish layer
+(function initFishClipping(){
+    if(!fishContainer) return;
+    let lastY = -1; let rafId = null; 
+    function computeWaterlineY(){
+        const ws = document.querySelector('.water-surface');
+        if(!ws) return 0;
+        const r = ws.getBoundingClientRect();
+        // If the water-surface has scrolled above the viewport, allow fish from the very top
+        if(r.bottom <= 0) return 0;
+        // Otherwise clip above the current visible water line
+        return Math.max(0, Math.floor(r.bottom));
+    }
+    function applyClip(){
+        const y = computeWaterlineY();
+        if(y !== lastY){
+            lastY = y;
+            const val = `inset(${y}px 0 0 0)`;
+            fishContainer.style.clipPath = val;
+            fishContainer.style.webkitClipPath = val;
+        }
+        rafId = null;
+    }
+    function schedule(){ if(rafId==null) rafId = requestAnimationFrame(applyClip); }
+    window.addEventListener('scroll', schedule, { passive:true });
+    window.addEventListener('resize', schedule);
+    schedule();
+})();
 
 class Fish {
     constructor() {
