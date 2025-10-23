@@ -13,13 +13,16 @@ function updateDayNight() {
     
     const skySection = document.getElementById('skySection');
     const contentSection = document.getElementById('contentSection');
+    const oceanGradient = document.getElementById('oceanGradient');
     
     if (isNight) {
         skySection.classList.add('night');
         contentSection.classList.add('night');
+        if(oceanGradient) oceanGradient.classList.add('night');
     } else {
         skySection.classList.remove('night');
         contentSection.classList.remove('night');
+        if(oceanGradient) oceanGradient.classList.remove('night');
     }
 }
 
@@ -118,6 +121,34 @@ initBubbles();
             const val = `inset(${y}px 0 0 0)`;
             bubbleLayer.style.clipPath = val;
             bubbleLayer.style.webkitClipPath = val;
+        }
+        rafId = null;
+    }
+    function schedule(){ if(rafId==null) rafId = requestAnimationFrame(applyClip); }
+    window.addEventListener('scroll', schedule, { passive:true });
+    window.addEventListener('resize', schedule);
+    schedule();
+})();
+
+// Clip the global ocean gradient to stay below the waterline
+(function initOceanClipping(){
+    const oceanLayer = document.getElementById('oceanGradient');
+    if(!oceanLayer) return;
+    let lastY = -1; let rafId = null;
+    function computeWaterlineY(){
+        const ws = document.querySelector('.water-surface');
+        if(!ws) return 0;
+        const r = ws.getBoundingClientRect();
+        if(r.bottom <= 0) return 0;
+        return Math.max(0, Math.floor(r.bottom));
+    }
+    function applyClip(){
+        const y = computeWaterlineY();
+        if(y !== lastY){
+            lastY = y;
+            const val = `inset(${y}px 0 0 0)`;
+            oceanLayer.style.clipPath = val;
+            oceanLayer.style.webkitClipPath = val;
         }
         rafId = null;
     }
@@ -302,3 +333,56 @@ for (let i = 0; i < 6; i++) {
 }
 
 animate();
+
+// Populate global ocean floor with plants and shrimp
+(function initOceanFloorDecor(){
+    const floor = document.getElementById('oceanFloor');
+    if(!floor) return;
+    const vw = () => Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
+
+    function addPlant(type, left, height, sway){
+        const p = document.createElement('div');
+        p.className = `plant ${type}`;
+        p.style.left = left + '%';
+        p.style.setProperty('--h', height + 'px');
+        p.style.setProperty('--sway', sway + 's');
+        floor.appendChild(p);
+        return p;
+    }
+
+    function addShrimp(left, width, duration, flip){
+        const s = document.createElement('div');
+        s.className = 'shrimp';
+        s.style.left = left + '%';
+        s.style.setProperty('--w', width + 'px');
+        s.style.setProperty('--drift', duration + 's');
+        if(flip) s.style.transform = 'scaleX(-1)';
+        floor.appendChild(s);
+        return s;
+    }
+
+    const plantTypes = ['seaweed','kelp','seagrass','coral'];
+    const plantCount = vw() < 640 ? 10 : 16;
+    const usedSlots = new Set();
+    for(let i=0;i<plantCount;i++){
+        const type = plantTypes[Math.floor(Math.random()*plantTypes.length)];
+        // pick a left slot in 2% increments to reduce overlap
+        let slot = Math.floor(Math.random()*50);
+        let guard = 0;
+        while(usedSlots.has(slot) && guard++ < 50){ slot = Math.floor(Math.random()*50); }
+        usedSlots.add(slot);
+        const left = slot*2 + (Math.random()*1.2-0.6);
+        const height = 70 + Math.random()*120;
+        const sway = 7 + Math.random()*6;
+        addPlant(type, left, height, sway);
+    }
+
+    const shrimpCount = vw() < 640 ? 2 : 4;
+    for(let i=0;i<shrimpCount;i++){
+        const left = 5 + Math.random()*90;
+        const width = 16 + Math.random()*10;
+        const duration = 18 + Math.random()*12;
+        const flip = Math.random() < 0.5;
+        addShrimp(left, width, duration, flip);
+    }
+})();

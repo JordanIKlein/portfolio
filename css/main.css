@@ -341,7 +341,7 @@ body {
 }
 
 .content-section {
-    background: linear-gradient(to bottom, #0088b8 0%, #006994 100%);
+    background: transparent; /* ocean gradient handled by global layer */
     min-height: 40vh;
     padding: 60px 16px 40px;
     position: relative;
@@ -350,7 +350,7 @@ body {
 }
 
 .content-section.night {
-    background: linear-gradient(to bottom, #004466 0%, #002233 100%);
+    background: transparent; /* night handled by global ocean layer */
 }
 
 .container {
@@ -734,7 +734,7 @@ body {
 }
 
 .portfolio-section {
-    background: linear-gradient(to bottom, #0088b8 0%, #006994 100%);
+    background: transparent; /* use global ocean gradient layer */
 }
 
 .portfolio-section .seabed {
@@ -748,11 +748,11 @@ body {
 }
 
 .tanks-section {
-    background: linear-gradient(to bottom, #0088b8 0%, #006994 100%);
+    background: transparent; /* use global ocean gradient layer */
 }
 
 .skills-section {
-    background: linear-gradient(to bottom, #0088b8 0%, #006994 100%);
+    background: transparent; /* use global ocean gradient layer */
 }
 
 .skills-section .ocean-floor {
@@ -774,3 +774,147 @@ body {
 
 .fish-layer { z-index: 3; }
 .bubble-layer { z-index: 2; }
+
+/* Global Ocean Gradient Layer spanning all sections */
+.ocean-gradient-layer {
+    position: fixed;
+    inset: 0;
+    z-index: 1; /* Behind bubbles and fish; in front of plain backgrounds */
+    pointer-events: none;
+    background: linear-gradient(to bottom, #0088b8 0%, #006994 100%);
+}
+
+.ocean-gradient-layer.night {
+    background: linear-gradient(to bottom, #004466 0%, #002233 100%);
+}
+
+/* Global ocean floor at the very bottom of the page */
+.ocean-floor-global {
+    position: relative;
+    height: 200px;
+    background:
+        radial-gradient(ellipse at 50% -40px, rgba(255,255,255,0.1), rgba(255,255,255,0) 60%),
+        repeating-linear-gradient(45deg, rgba(0,0,0,0.03) 0 10px, rgba(255,255,255,0.03) 10px 20px),
+        linear-gradient(to top, #cdbf8a, #e8dbb1 55%, rgba(232,219,177,0));
+    border-top-left-radius: 40% 30px;
+    border-top-right-radius: 40% 30px;
+    z-index: 2; /* above ocean gradient, below bubbles/fish */
+    overflow: hidden;
+}
+
+.ocean-floor-global::before {
+    content: '';
+    position: absolute;
+    left: 0; right: 0; top: -30px; height: 60px;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.05), rgba(0,0,0,0));
+    pointer-events: none;
+}
+
+/* Plant base */
+.plant {
+    position: absolute;
+    bottom: 0;
+    transform-origin: bottom center;
+    animation: sway-slow var(--sway, 8s) ease-in-out infinite;
+    filter: drop-shadow(0 2px 2px rgba(0,0,0,0.15));
+}
+
+@keyframes sway-slow {
+    0%, 100% { transform: rotate(-3deg); }
+    50% { transform: rotate(3deg); }
+}
+
+/* Seaweed: tall thin blades */
+.plant.seaweed {
+    width: 6px;
+    height: var(--h, 120px);
+    background: linear-gradient(to right, hsl(145,40%,35%), hsl(145,50%,45%));
+    border-radius: 6px 6px 0 0;
+}
+
+/* Kelp: segmented leaves */
+.plant.kelp {
+    width: 10px;
+    height: var(--h, 140px);
+    background: linear-gradient(to right, #2e8b57, #3faa6b);
+    border-radius: 8px 8px 0 0;
+}
+.plant.kelp::before, .plant.kelp::after {
+    content: '';
+    position: absolute;
+    left: 50%; transform: translateX(-50%);
+    width: 28px; height: 18px;
+    background: radial-gradient(circle at 60% 50%, #3faa6b, #2e8b57);
+    border-radius: 50% 50% 40% 40%;
+}
+.plant.kelp::before { top: 30%; }
+.plant.kelp::after { top: 58%; width: 32px; height: 22px; }
+
+/* Seagrass: tuft clusters */
+.plant.seagrass {
+    width: 2px;
+    height: var(--h, 90px);
+    background: linear-gradient(to right, #1f7a4c, #2d9a62);
+    box-shadow: -6px 0 0 0 #2d9a62, 6px 0 0 0 #2d9a62, -10px 0 0 0 #1f7a4c, 10px 0 0 0 #1f7a4c;
+}
+
+/* Coral: branching */
+.plant.coral {
+    width: 10px;
+    height: var(--h, 80px);
+    background: linear-gradient(to right, #ff6b6b, #ff8e8e);
+    border-radius: 6px;
+}
+.plant.coral::before, .plant.coral::after {
+    content: '';
+    position: absolute;
+    width: 8px; height: 40px;
+    background: linear-gradient(to right, #ff6b6b, #ff8e8e);
+    border-radius: 6px;
+}
+.plant.coral::before { top: 20%; left: -10px; transform: rotate(-25deg); }
+.plant.coral::after { top: 35%; right: -10px; transform: rotate(25deg); }
+
+/* Shrimp */
+.shrimp {
+    position: absolute;
+    bottom: 8px;
+    width: var(--w, 20px);
+    height: calc(var(--w, 20px) * 0.55);
+    background: radial-gradient(circle at 30% 50%, #ffd1c4, #ff9a80);
+    border-radius: 20px 16px 16px 20px / 16px 12px 12px 16px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    transform-origin: center;
+    animation: shrimp-drift var(--drift, 22s) ease-in-out infinite, shrimp-bob 6s ease-in-out infinite;
+}
+.shrimp::before {
+    content: '';
+    position: absolute;
+    left: -6px; top: 50%;
+    width: 8px; height: 2px;
+    background: #ffb09b;
+    box-shadow: 0 -4px 0 0 #ffb09b, 0 4px 0 0 #ffb09b;
+}
+.shrimp::after {
+    content: '';
+    position: absolute;
+    right: -6px; top: 50%;
+    width: 8px; height: 8px;
+    border-right: 6px solid #ffb09b;
+    border-top: 4px solid transparent;
+    border-bottom: 4px solid transparent;
+    transform: translateY(-50%);
+}
+
+@keyframes shrimp-drift {
+    0%, 100% { transform: translateX(0); }
+    50% { transform: translateX(40px); }
+}
+@keyframes shrimp-bob {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-4px); }
+}
+
+@media (max-width: 768px) {
+    .ocean-floor-global { height: 160px; }
+}
