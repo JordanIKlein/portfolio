@@ -380,23 +380,48 @@ body {
     margin-bottom: 30px;
 }
 
+.cta-group{
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+    align-items: stretch;
+    margin-top: 14px;
+}
+
 .cta-button {
-    display: inline-block;
-    padding: 15px 40px;
-    background: #FF6347;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    height: 48px;
+    padding: 0 22px;
+    background: linear-gradient(180deg, #ff6e54, #ff6347 60%);
     color: white;
     text-decoration: none;
-    border-radius: 50px;
-    font-size: 1.1em;
-    font-weight: bold;
-    transition: all 0.3s;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    border-radius: 999px;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: .2px;
+    transition: transform .2s ease, box-shadow .2s ease, background .2s ease;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.25);
 }
 
 .cta-button:hover {
-    background: #FF4500;
-    transform: translateY(-3px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+    background: linear-gradient(180deg, #ff7a62, #ff4e2f 60%);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px rgba(0,0,0,0.28);
+}
+.cta-button:active{
+    transform: translateY(0);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+}
+.cta-button:focus-visible{
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(255,255,255,0.5), 0 0 0 6px rgba(255,99,71,0.65);
+}
+.cta-button .icon{
+    width: 18px; height: 18px; flex: 0 0 18px;
+    fill: currentColor;
 }
 
 .profile-container {
@@ -706,6 +731,9 @@ body {
         font-size: 2em;
     }
 
+    .cta-group{ grid-template-columns: 1fr; }
+    .cta-button{ height: 46px; }
+
     .boat {
         width: 100px;
         height: 40px;
@@ -731,6 +759,33 @@ body {
     color: #fff;
     position: relative;
     z-index: 5;
+}
+
+/* Section headers for clarity across the page */
+.section-header{
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 28px 20px 8px;
+    position: relative;
+    z-index: 5;
+    color: #fff;
+}
+.section-header h2{
+    font-size: clamp(1.5rem, 1.1rem + 1.2vw, 2.1rem);
+    font-weight: 800;
+    letter-spacing: .2px;
+    text-shadow: 0 2px 6px rgba(0,0,0,0.35);
+    display: inline-block;
+    position: relative;
+}
+.section-header h2::after{
+    content: '';
+    display: block;
+    height: 3px;
+    width: 64px;
+    margin-top: 8px;
+    border-radius: 2px;
+    background: linear-gradient(90deg, rgba(255,255,255,.75), rgba(255,255,255,0));
 }
 
 .portfolio-section {
@@ -766,6 +821,12 @@ body {
         linear-gradient(to top, #cdbf8a, #e8dbb1 50%, rgba(232,219,177,0));
 }
 
+/* Reduce whitespace between Fish Tanks and Skills sections */
+.tanks-section, .skills-section { min-height: 70vh; }
+.tanks-section .section-inner { padding-top: 24px; padding-bottom: 28px; }
+.skills-section .section-header { padding-top: 12px; }
+.skills-section .section-inner { padding-top: 12px; padding-bottom: 36px; }
+
 .fish-layer, .bubble-layer {
     position: fixed;
     inset: 0;
@@ -791,11 +852,11 @@ body {
 /* Global ocean floor at the very bottom of the page */
 .ocean-floor-global {
     position: relative;
-    height: 200px;
+    height: 220px;
     background:
-        radial-gradient(ellipse at 50% -40px, rgba(255,255,255,0.1), rgba(255,255,255,0) 60%),
-        repeating-linear-gradient(45deg, rgba(0,0,0,0.03) 0 10px, rgba(255,255,255,0.03) 10px 20px),
-        linear-gradient(to top, #cdbf8a, #e8dbb1 55%, rgba(232,219,177,0));
+        radial-gradient(ellipse at 50% -60px, rgba(255,255,255,0.12), rgba(255,255,255,0) 60%),
+        radial-gradient(1.6px 1.6px at 12px 12px, rgba(255,255,255,0.05) 49%, rgba(0,0,0,0) 51%) repeat 0 0/28px 28px,
+        linear-gradient(to top, #cdbf8a, #e8dbb1 58%, rgba(232,219,177,0));
     border-top-left-radius: 40% 30px;
     border-top-right-radius: 40% 30px;
     z-index: 2; /* above ocean gradient, below bubbles/fish */
@@ -807,6 +868,15 @@ body {
     position: absolute;
     left: 0; right: 0; top: -30px; height: 60px;
     background: linear-gradient(to bottom, rgba(0,0,0,0.05), rgba(0,0,0,0));
+    pointer-events: none;
+}
+
+.ocean-floor-global::after {
+    content: '';
+    position: absolute;
+    left: -10vw; right: -10vw; top: -80px; height: 240px;
+    background: radial-gradient(60% 100% at 50% 0, rgba(0,0,0,0.25), rgba(0,0,0,0) 70%);
+    opacity: .25;
     pointer-events: none;
 }
 
@@ -822,6 +892,15 @@ body {
 @keyframes sway-slow {
     0%, 100% { transform: rotate(-3deg); }
     50% { transform: rotate(3deg); }
+}
+
+/* Wrapper to allow additional mouse-influenced tilt without fighting inner animation */
+.plant-wrap{
+    position: absolute;
+    bottom: 0;
+    transform-origin: bottom center;
+    will-change: transform;
+    pointer-events: none;
 }
 
 /* Seaweed: tall thin blades */
@@ -875,46 +954,10 @@ body {
 .plant.coral::before { top: 20%; left: -10px; transform: rotate(-25deg); }
 .plant.coral::after { top: 35%; right: -10px; transform: rotate(25deg); }
 
-/* Shrimp */
-.shrimp {
-    position: absolute;
-    bottom: 8px;
-    width: var(--w, 20px);
-    height: calc(var(--w, 20px) * 0.55);
-    background: radial-gradient(circle at 30% 50%, #ffd1c4, #ff9a80);
-    border-radius: 20px 16px 16px 20px / 16px 12px 12px 16px;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.2);
-    transform-origin: center;
-    animation: shrimp-drift var(--drift, 22s) ease-in-out infinite, shrimp-bob 6s ease-in-out infinite;
-}
-.shrimp::before {
-    content: '';
-    position: absolute;
-    left: -6px; top: 50%;
-    width: 8px; height: 2px;
-    background: #ffb09b;
-    box-shadow: 0 -4px 0 0 #ffb09b, 0 4px 0 0 #ffb09b;
-}
-.shrimp::after {
-    content: '';
-    position: absolute;
-    right: -6px; top: 50%;
-    width: 8px; height: 8px;
-    border-right: 6px solid #ffb09b;
-    border-top: 4px solid transparent;
-    border-bottom: 4px solid transparent;
-    transform: translateY(-50%);
-}
-
-@keyframes shrimp-drift {
-    0%, 100% { transform: translateX(0); }
-    50% { transform: translateX(40px); }
-}
-@keyframes shrimp-bob {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-4px); }
-}
+/* Shrimp removed by request */
 
 @media (max-width: 768px) {
     .ocean-floor-global { height: 160px; }
+    /* Further reduce heights on mobile */
+    .tanks-section, .skills-section { min-height: 60vh; }
 }

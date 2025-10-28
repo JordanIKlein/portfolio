@@ -8,25 +8,6 @@
     document.head.appendChild(style);
   }
 
-  const floor=document.querySelector('#skills .ocean-floor');
-  if(floor){
-    const decor=document.createElement('div');
-    decor.className='seafloor-decor';
-    floor.appendChild(decor);
-    const width=window.innerWidth;
-    for(let i=0;i<10;i++){
-      const p=document.createElement('div');
-      p.className='plant';
-      p.style.left=(5+Math.random()*90)+'%';
-      p.style.height=(60+Math.random()*60)+'px';
-      p.style.animationDelay=(Math.random()*2).toFixed(2)+'s';
-      decor.appendChild(p);
-    }
-    for(let s=0;s<4;s++){
-      const shr=document.createElement('div');
-      shr.className='shrimp';
-      shr.style.left=(10+Math.random()*80)+'%';
-      decor.appendChild(shr);
-    }
-  }
+  // Remove local seafloor decorations (plants/shrimp) in favor of global ocean floor
+  // Previously generated `.plant` and `.shrimp` elements here; now omitted by request.
 })();

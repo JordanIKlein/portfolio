@@ -38,7 +38,7 @@ document.addEventListener('click', (e) => {
     }
 });
 
-// Lazy load section content
+// Lazy load section content (with retry and fallbacks)
 const lazyContainers = Array.from(document.querySelectorAll('.lazy[data-src]'));
 const loadedAssets = new Set();
 function ensureSectionAssets(sectionId){
@@ -59,28 +59,57 @@ function ensureSectionAssets(sectionId){
         loadedAssets.add(jsPath);
     }
 }
-const lazyObserver = new IntersectionObserver((entries, obs) => {
-    entries.forEach(async (entry) => {
+async function loadLazyContainer(el, retries = 1){
+    if(el.dataset.loaded || el.dataset.loading) return;
+    const src = el.getAttribute('data-src');
+    const section = el.closest('section');
+    ensureSectionAssets(section ? section.id : null);
+    if(!src) return;
+    try{
+        el.dataset.loading = 'true';
+        const res = await fetch(src, { cache: 'no-store' });
+        if(!res.ok) throw new Error(`HTTP ${res.status}`);
+        const html = await res.text();
+        el.innerHTML = html;
+        el.dataset.loaded = 'true';
+    }catch(err){
+        delete el.dataset.loading;
+        if(retries > 0){
+            setTimeout(()=>loadLazyContainer(el, retries - 1), 800);
+        } else {
+            el.innerHTML = '<div style="color:#fff;opacity:.8">Failed to load content. Retrying soon…</div>';
+        }
+    }
+}
+
+const lazyObserver = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
         if (!entry.isIntersecting) return;
         const el = entry.target;
-        const src = el.getAttribute('data-src');
-        const section = el.closest('section');
-        ensureSectionAssets(section ? section.id : null);
-        if (src && !el.dataset.loaded) {
-            try {
-                const res = await fetch(src, { cache: 'no-store' });
-                const html = await res.text();
-                el.innerHTML = html;
-                el.dataset.loaded = 'true';
-            } catch (err) {
-                el.innerHTML = '<div style="color:#fff;opacity:.8">Failed to load content.</div>';
-            }
+        loadLazyContainer(el, 2);
+        // keep observing until actually loaded, then we can unobserve
+        if(el.dataset.loaded){
+            lazyObserver.unobserve(el);
         }
-        obs.unobserve(el);
     });
-}, { rootMargin: '0px 0px -20% 0px', threshold: 0.15 });
+}, { rootMargin: '0px 0px 30% 0px', threshold: 0.01 });
 
 lazyContainers.forEach(c => lazyObserver.observe(c));
+
+// Fallbacks: try loading anything already near viewport after window load and on idle
+window.addEventListener('load', () => {
+    lazyContainers.forEach(el => {
+        const r = el.getBoundingClientRect();
+        if(r.top < window.innerHeight + 200){
+            loadLazyContainer(el, 2);
+        }
+    });
+    if('requestIdleCallback' in window){
+        requestIdleCallback(()=> lazyContainers.forEach(el => loadLazyContainer(el, 1)), { timeout: 3000 });
+    } else {
+        setTimeout(()=> lazyContainers.forEach(el => loadLazyContainer(el, 1)), 3000);
+    }
+});
 
 // Global bubbles across all sections
 function initBubbles(){
@@ -242,21 +271,24 @@ class Fish {
         const fishCenterX = rect.left + rect.width / 2;
         const fishCenterY = rect.top + rect.height / 2;
         
-    const deltaX = mouseX - fishCenterX;
-    const deltaY = mouseY - fishCenterY;
-        const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-        
-        const avoidRadius = 150;
-        
-        if (distance < avoidRadius && distance > 0) {
-            const force = (avoidRadius - distance) / avoidRadius;
-            const angle = Math.atan2(deltaY, deltaX);
-            
-            this.avoidX = -Math.cos(angle) * 2.5 * force;
-            this.avoidY = -Math.sin(angle) * 2.5 * force;
+        if (mouseActive) {
+            const deltaX = mouseX - fishCenterX;
+            const deltaY = mouseY - fishCenterY;
+            const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+            const avoidRadius = 150;
+            if (distance < avoidRadius && distance > 0) {
+                const force = (avoidRadius - distance) / avoidRadius;
+                const angle = Math.atan2(deltaY, deltaX);
+                this.avoidX = -Math.cos(angle) * 2.5 * force;
+                this.avoidY = -Math.sin(angle) * 2.5 * force;
+            } else {
+                this.avoidX *= 0.92;
+                this.avoidY *= 0.92;
+            }
         } else {
-            this.avoidX *= 0.92;
-            this.avoidY *= 0.92;
+            // If no mouse present, relax avoidance to zero smoothly
+            this.avoidX *= 0.9;
+            this.avoidY *= 0.9;
         }
         
         const swimX = this.speed * this.direction;
@@ -298,10 +330,23 @@ class Fish {
 
 let mouseX = -1000;
 let mouseY = -1000;
+let mouseActive = false;
 
 document.addEventListener('mousemove', (e) => {
+    mouseActive = true;
     mouseX = e.clientX;
     mouseY = e.clientY;
+});
+
+function deactivateMouseTracking(){
+    mouseActive = false;
+    mouseX = -10000;
+    mouseY = -10000;
+}
+document.addEventListener('mouseleave', deactivateMouseTracking);
+window.addEventListener('blur', deactivateMouseTracking);
+document.addEventListener('visibilitychange', () => {
+    if(document.visibilityState !== 'visible') deactivateMouseTracking();
 });
 
 function spawnFish() {
@@ -340,49 +385,81 @@ animate();
     if(!floor) return;
     const vw = () => Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
 
+    const plantWraps = [];
+    const plantCenters = [];
+    const plantTargetTilt = [];
+    const plantTilt = [];
+    let tiltRAF = null;
+
     function addPlant(type, left, height, sway){
+        const wrap = document.createElement('div');
+        wrap.className = 'plant-wrap';
+        wrap.style.left = left + '%';
         const p = document.createElement('div');
         p.className = `plant ${type}`;
-        p.style.left = left + '%';
         p.style.setProperty('--h', height + 'px');
         p.style.setProperty('--sway', sway + 's');
-        floor.appendChild(p);
-        return p;
+        wrap.appendChild(p);
+        floor.appendChild(wrap);
+        plantWraps.push(wrap);
+        plantTargetTilt.push(0);
+        plantTilt.push(0);
+        return wrap;
     }
 
-    function addShrimp(left, width, duration, flip){
-        const s = document.createElement('div');
-        s.className = 'shrimp';
-        s.style.left = left + '%';
-        s.style.setProperty('--w', width + 'px');
-        s.style.setProperty('--drift', duration + 's');
-        if(flip) s.style.transform = 'scaleX(-1)';
-        floor.appendChild(s);
-        return s;
-    }
 
     const plantTypes = ['seaweed','kelp','seagrass','coral'];
-    const plantCount = vw() < 640 ? 10 : 16;
+    const plantCount = vw() < 640 ? 12 : 18;
     const usedSlots = new Set();
     for(let i=0;i<plantCount;i++){
         const type = plantTypes[Math.floor(Math.random()*plantTypes.length)];
-        // pick a left slot in 2% increments to reduce overlap
         let slot = Math.floor(Math.random()*50);
         let guard = 0;
-        while(usedSlots.has(slot) && guard++ < 50){ slot = Math.floor(Math.random()*50); }
+        while(usedSlots.has(slot) && guard++ < 60){ slot = Math.floor(Math.random()*50); }
         usedSlots.add(slot);
         const left = slot*2 + (Math.random()*1.2-0.6);
         const height = 70 + Math.random()*120;
         const sway = 7 + Math.random()*6;
         addPlant(type, left, height, sway);
     }
-
-    const shrimpCount = vw() < 640 ? 2 : 4;
-    for(let i=0;i<shrimpCount;i++){
-        const left = 5 + Math.random()*90;
-        const width = 16 + Math.random()*10;
-        const duration = 18 + Math.random()*12;
-        const flip = Math.random() < 0.5;
-        addShrimp(left, width, duration, flip);
+    // compute centers once laid out and on resize
+    function computeCenters(){
+        plantCenters.length = 0;
+        for(const w of plantWraps){
+            const r = w.getBoundingClientRect();
+            plantCenters.push(r.left + r.width/2);
+        }
     }
+    computeCenters();
+    window.addEventListener('resize', computeCenters);
+
+    // mouse-influenced swaying on top of base animation
+    function schedulePlantTilt(){
+        if(tiltRAF!=null) return;
+        tiltRAF = requestAnimationFrame(function tick(){
+            tiltRAF = null;
+            const maxTilt = 8; // degrees
+            const radius = Math.min(260, Math.max(180, window.innerWidth*0.18));
+            let needsMore = false;
+            for(let i=0;i<plantWraps.length;i++){
+                const dx = mouseX - plantCenters[i];
+                let t = 0;
+                if(mouseActive){
+                    const influence = Math.max(0, 1 - Math.abs(dx)/radius);
+                    t = Math.max(-1, Math.min(1, (plantCenters[i] - mouseX)/radius)) * maxTilt * influence;
+                }
+                plantTargetTilt[i] = t;
+                const next = plantTilt[i] + (plantTargetTilt[i] - plantTilt[i]) * 0.12;
+                if(Math.abs(next - plantTilt[i]) > 0.02) needsMore = true;
+                plantTilt[i] = next;
+                plantWraps[i].style.transform = `rotate(${plantTilt[i].toFixed(2)}deg)`;
+            }
+            if(needsMore) {
+                tiltRAF = requestAnimationFrame(tick);
+            }
+        });
+    }
+
+    document.addEventListener('mousemove', schedulePlantTilt);
+    document.addEventListener('mouseleave', schedulePlantTilt);
 })();
