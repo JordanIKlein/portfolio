@@ -463,3 +463,23 @@ animate();
     document.addEventListener('mousemove', schedulePlantTilt);
     document.addEventListener('mouseleave', schedulePlantTilt);
 })();
+
+// On mobile, force-disable horizontal scrolling as a safety net
+(function lockHorizontalScrollOnMobile(){
+    const mq = window.matchMedia('(max-width: 768px)');
+    let raf = null;
+    function onScroll(){
+        if(!mq.matches) return;
+        if(raf) return;
+        raf = requestAnimationFrame(()=>{
+            raf = null;
+            if(window.scrollX !== 0){
+                window.scrollTo(0, window.scrollY);
+            }
+        });
+    }
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', ()=>{ if(!mq.matches) return; onScroll(); }, { passive: true });
+    // Initial correction in case we land offset
+    if(mq.matches && window.scrollX !== 0) window.scrollTo(0, window.scrollY);
+})();

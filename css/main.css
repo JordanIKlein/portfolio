@@ -10,6 +10,17 @@ body {
     transition: background 1s ease;
 }
 
+/* Mobile: hard-disable horizontal scrolling everywhere */
+@media (max-width: 768px) {
+    html, body { max-width: 100vw; overflow-x: clip; position: relative; }
+    /* Fallback for older browsers */
+    @supports not (overflow-x: clip) {
+        html, body { overflow-x: hidden; }
+    }
+    /* Prevent child sections from extending the layout width */
+    .sky-section, .content-section, .section { overflow-x: clip; }
+}
+
 .sky-section {
     min-height: 60vh;
     background: linear-gradient(to bottom, #87CEEB 0%, #B0E0E6 100%);
