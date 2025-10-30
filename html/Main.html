@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Portfolio - Home</title>
     <link rel="stylesheet" href="/css/main.css">
+    <!-- Ensure Skills section styles are always available -->
+    <link rel="stylesheet" href="/css/skills.css">
 </head>
 <body>
     <div class="sky-section" id="skySection">
@@ -86,7 +88,41 @@
         <header class="section-header">
             <h2>Skills &amp; Achievements</h2>
         </header>
-        <div class="section-inner lazy" data-src="/html/skills.html"></div>
+        <div class="section-inner">
+            <div class="skills-intro">
+    <p>I build secure, resilient systems and compelling user experiences. My work spans security engineering, automation, and full‑stack development with a focus on quality and velocity.</p>
+</div>
+<div class="skills-list">
+    <div class="skill-item">
+        <img src="/media/images/securityplus.png" alt="Security Plus" loading="lazy">
+        <div class="text">
+            <h3>Comptia Security+ CE</h3>
+            <p>Candidate ID: COMP001022824115 Acquired: 2025-06-12</p>
+        </div>
+    </div>
+    <div class="skill-item">
+        <img src="/media/images/cspo.png" alt="Scrum Product Owner" loading="lazy">
+        <div class="text">
+            <h3>Scrum Product Owner</h3>
+            <p>Certificant ID: 001286461 Acquired: 2021-12-03</p>
+        </div>
+    </div>
+    <div class="skill-item">
+        <img src="/media/images/aws.png" alt="AWS Cloud Security" loading="lazy">
+        <div class="text">
+            <h3>AWS Certified Cloud Practitioner</h3>
+            <p>Acquired: 2023-10-12</p>
+        </div>
+    </div>
+    <div class="skill-item">
+        <img src="/media/images/github-actions.png" alt="GitHub Actions" loading="lazy">
+        <div class="text">
+            <h3>GitHub Actions</h3>
+            <p>Acquired: 2024-06-13</p>
+        </div>
+    </div>
+</div>
+        </div>
         <div class="ocean-floor"></div>
     </section>
 
@@ -97,5 +133,7 @@
     <div id="bubbleLayer" class="bubble-layer" aria-hidden="true"></div>
 
     <script src="/javascript/main.js"></script>
+    <!-- Skills scripts (animations/interactions) loaded eagerly now that section is inlined -->
+    <script src="/javascript/skills.js"></script>
 </body>
 </html>

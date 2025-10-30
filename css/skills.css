@@ -1,9 +1,12 @@
+#skills{position:relative;z-index:10}
+#skills::before{content:"";position:absolute;inset:0;background:linear-gradient(to bottom,#08233c 0%,#0a3553 100%);z-index:0}
+#skills .section-header,#skills .section-inner{position:relative;z-index:11}
 #skills .section-inner{padding-top:32px;padding-bottom:60px}
-#skills .skills-intro{max-width:900px;margin:0 auto 28px auto;text-align:center}
+#skills .skills-intro{max-width:900px;margin:0 auto 28px auto;text-align:center;background:#0d304c;border:1px solid rgba(255,255,255,0.18);border-radius:12px;padding:16px}
 #skills .skills-intro h2{margin:0 0 10px 0;color:#fff}
 #skills .skills-intro p{margin:0;color:#e6f4ff;line-height:1.7}
-#skills .skills-list{display:grid;grid-template-columns:1fr;gap:16px;max-width:1000px;margin:0 auto;position:relative;z-index:3}
-#skills .skill-item{display:grid;grid-template-columns:150px 1fr;gap:16px;align-items:center;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);border-radius:14px;padding:14px 16px;backdrop-filter:blur(4px)}
+#skills .skills-list{display:grid;grid-template-columns:1fr;gap:16px;max-width:1000px;margin:0 auto;position:relative;z-index:12}
+#skills .skill-item{display:grid;grid-template-columns:150px 1fr;gap:16px;align-items:center;background:#143d5d;border:1px solid rgba(255,255,255,0.2);border-radius:14px;padding:14px 16px}
 #skills .skill-item img{width:150px;height:110px;object-fit:cover;border-radius:10px}
 #skills .skill-item h3{margin:0 0 6px 0;color:#fff}
 #skills .skill-item p{margin:0;color:#e6f4ff;line-height:1.6}

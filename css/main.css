@@ -811,14 +811,14 @@ body {
 }
 
 .skills-section .ocean-floor {
+    /* Only used as a thin separator line at the bottom of the skills section. */
     position: absolute;
     bottom: 0;
     left: 0;
     right: 0;
-    height: 160px;
-    background:
-        repeating-linear-gradient(45deg, rgba(0,0,0,0.03) 0 8px, rgba(255,255,255,0.03) 8px 16px),
-        linear-gradient(to top, #cdbf8a, #e8dbb1 50%, rgba(232,219,177,0));
+    height: 0; /* allow border-top from #skills .ocean-floor to show without rendering a second sand layer */
+    background: none;
+    pointer-events: none;
 }
 
 /* Reduce whitespace between Fish Tanks and Skills sections */
@@ -835,6 +835,10 @@ body {
 
 .fish-layer { z-index: 3; }
 .bubble-layer { z-index: 2; }
+
+/* Ensure the Skills section is always above fish/bubbles */
+#skills { position: relative; z-index: 10; }
+#skills .section-header, #skills .section-inner { position: relative; z-index: 11; }
 
 /* Global Ocean Gradient Layer spanning all sections */
 .ocean-gradient-layer {
